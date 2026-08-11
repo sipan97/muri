@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موری | گەوهەرێ زانیاریان</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="logo">
+            <h2>Muri</h2>
+            <p>موری | گەوهەرێ زانیاریان</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#home">سەرەکی</a></li>
+                <li><a href="#grades">پۆلەکان</a></li>
+                <li><a href="#ppt-section">پاوەرپۆینت</a></li>
+                <li><a href="#ministerial">پرسیارێن وەزاری</a></li>
+                <li><a href="#quizzes">کویز</a></li>
+                <li><a href="#about">دەربارەی من</a></li>
+                <li><button onclick="toggleAdminPanel()" class="btn-admin-nav"><i class="fa-solid fa-plus-circle"></i> زێدەکرنا ناڤەڕۆکێ</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Admin Panel (Popup Modal) -->
+    <div id="adminModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-folder-plus"></i> زێدەکرنا ناڤەڕۆکا نوو</h3>
+                <span onclick="toggleAdminPanel()" class="close-btn">&times;</span>
+            </div>
+            <form id="addContentForm" onsubmit="handleAdminSubmit(event)">
+                <div class="form-group">
+                    <label>جۆرێ بابەتێ:</label>
+                    <select id="contentType" onchange="toggleFormFields()">
+                        <option value="ppt">وانەیا پاوەرپۆینت (PPT)</option>
+                        <option value="ministerial">پرسیارا وەزاری (PDF)</option>
+                        <option value="quiz">کویز / پرسیارا هەڵبژاردن</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>ناڤ / پرسیار / سەردێڕ:</label>
+                    <input type="text" id="contentTitle" placeholder="سەردێڕ یان پرسیارێ بنڤێسە..." required>
+                </div>
+
+                <!-- بەشێ پاوەرپۆینت -->
+                <div id="pptFields" class="form-group">
+                    <label>پۆلێ هەڵبژێڕە:</label>
+                    <select id="lessonGrade">
+                        <option value="12">پۆلا ۱۲ی وێژەیی</option>
+                        <option value="11">پۆلا ۱۱ی وێژەیی</option>
+                        <option value="10">پۆلا ۱۰ی وێژەیی</option>
+                    </select>
+                </div>
+
+                <!-- بەشێ کویزان -->
+                <div id="quizFields" class="form-group" style="display: none;">
+                    <label>بژاردەیا 1:</label>
+                    <input type="text" id="opt1" placeholder="بەرسڤا ئێکێ">
+                    <label>بژاردەیا 2:</label>
+                    <input type="text" id="opt2" placeholder="بەرسڤا دووێ">
+                    <label>بژاردەیا 3:</label>
+                    <input type="text" id="opt3" placeholder="بەرسڤا سێێ">
+                    <label>ژمارەیا وەڵامێ دروست (1, 2, یان 3):</label>
+                    <input type="number" id="correctOpt" min="1" max="3" placeholder="1">
+                </div>
+
+                <!-- فایلا بەشێ PPT و PDF -->
+                <div id="fileGroup" class="form-group">
+                    <label>ناڤ یان لینکی فایلا (PPT یان PDF):</label>
+                    <input type="text" id="contentFile" placeholder="files/lesson_name.pptx">
+                </div>
+
+                <button type="submit" class="btn-submit"><i class="fa-solid fa-check"></i> تۆمارکرن و زێدەکرن</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hero / Welcome Section -->
+    <section id="home" class="hero-section">
+        <div class="hero-content">
+            <span class="badge">پێگەهێ فێرکاریی زانستی</span>
+            <h1>موری | گەوهەرێ زانیاریان</h1>
+            <p>سەرچاوەیەکێ تەمام بۆ وانەکانی پاوەرپۆینت، پرسیارێن وەزاری، و کویزێن ئینتەراکتیڤ یێن بابەتێ ئابووری.</p>
+            <div class="hero-buttons">
+                <a href="#ppt-section" class="btn btn-primary"><i class="fa-solid fa-file-powerpoint"></i> وانەیێن پاوەرپۆینت</a>
+                <a href="#ministerial" class="btn btn-secondary"><i class="fa-solid fa-graduation-cap"></i> پرسیارێن وەزاری</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Grade Selection Section -->
+    <section id="grades" class="container">
+        <h2 class="section-title">پۆلێ خۆ هەڵبژێڕە</h2>
+        <div class="grades-grid">
+            <div class="grade-card" onclick="filterByGrade('10')">
+                <div class="icon"><i class="fa-solid fa-book-open"></i></div>
+                <h3>پۆلا ۱۰ی وێژەیی</h3>
+                <p>سەرجەم وانە، کورتکراوە و پاوەرپۆینتێن پۆلا دەیێ.</p>
+            </div>
+            <div class="grade-card" onclick="filterByGrade('11')">
+                <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
+                <h3>پۆلا ۱۱ی وێژەیی</h3>
+                <p>وانەیێن شیکارکری و فایلا پاوەرپۆینتێ پۆلا یازدەیێ.</p>
+            </div>
+            <div class="grade-card featured" onclick="filterByGrade('12')">
+                <div class="icon"><i class="fa-solid fa-award"></i></div>
+                <h3>پۆلا ۱۲ی وێژەیی</h3>
+                <p>پاوەرپۆینتێن تەمام دگەل بانکێ پرسیارێن وەزاری ب ساڵانە.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PowerPoint Lessons Section -->
+    <section id="ppt-section" class="container">
+        <div class="section-header">
+            <h2 class="section-title">وانەیێن پاوەرپۆینت (PPT)</h2>
+            <div class="filter-controls">
+                <input type="text" id="searchInput" onkeyup="filterLessons()" placeholder="ل وانەیەکێ بگەڕیان...">
+                <div class="grade-buttons">
+                    <button class="active" onclick="filterByGrade('all', this)">هەموو</button>
+                    <button onclick="filterByGrade('10', this)">پۆلا ۱۰</button>
+                    <button onclick="filterByGrade('11', this)">پۆلا ۱۱</button>
+                    <button onclick="filterByGrade('12', this)">پۆلا ۱۲</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="lessonsContainer" class="lessons-grid"></div>
+    </section>
+
+    <!-- Ministerial Questions Section -->
+    <section id="ministerial" class="container bg-light">
+        <h2 class="section-title">پرسیارێن وەزاری (پۆلا ۱۲ی وێژەیی)</h2>
+        <p class="section-sub">پرسیارێن خولێن جودا جودا یێن وەزارەتێ بەردەستن بۆ داگرتنێ:</p>
+        
+        <div id="ministerialContainer" class="ministerial-grid"></div>
+    </section>
+
+    <!-- Interactive Quiz Section -->
+    <section id="quizzes" class="container">
+        <h2 class="section-title">تاقیکرنا ئاستی (کویزێن ئابووری)</h2>
+        <p class="section-sub">پشتڕاستبە ژ ئاستێ زانیاریێن خۆ ب بەرسڤدانا ڤان پرسیاران:</p>
+        
+        <div id="quizContainer" class="quiz-grid"></div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="container bg-light">
+        <h2 class="section-title">دەربارەی من و ئارمانجا وێبسایتی</h2>
+        
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="about-icon"><i class="fa-solid fa-user-graduate"></i></div>
+                <h3>دەربارەی مامۆستای</h3>
+                <p>ئەز <strong>مامۆستا سیپان موسى صالح</strong> مە، مامۆستایێ بابەتێ ئابووری ل قوتابخانا <strong>"ئامادەییا بریفکا بەرواری یا تێکەڵ"</strong>. خزمەتکرنا زانست و گەهاندنا زانیاریێن دروست بۆ قوتابیان ئارمانجا من یا سەرەکییە.</p>
+            </div>
+
+            <div class="about-card">
+                <div class="about-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                <h3>دروستکرنا وێبسایتی</h3>
+                <p>ئەڤ وێبساتە هاتیە دیزاینکرن ب نووترین ستانداردێن تەکنۆلۆژیایێ دا کو بشێوەیەکێ بێبەرامبەر، زوو، و ب ئاسانی د هەموو ئامێرەکان دا (مۆبایل و کۆمپیۆتەر) د خزمەتا هەموو ئالیان دا بێت.</p>
+            </div>
+
+            <div class="about-card">
+                <div class="about-icon"><i class="fa-solid fa-bullseye"></i></div>
+                <h3>ئارمانجا سەرەکی</h3>
+                <p>مەرەما سەرەکی ژ دروستکرنا ڤی پێگەهی، بگەهینەرەکێ زانستی یێ زەنگینە بۆ مفاگەهاندنا تەمامیا قوتابی و مامۆستایێن ئازیز یێن بابەتێ ئابووری. هیڤیدارم بێتە سەرچاوەکێ بەرهەمدار و جهێ مفای بۆ هەموو کەسان.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>مافێ پاراستییە بۆ <strong>موری | گەوهەرێ زانیاریان</strong> © 2026</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
